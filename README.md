@@ -134,6 +134,11 @@ The odds table reflects your config; `verify` checks your logs against it, but o
 whether they are genuine or complete. Which disclosure rules apply to you (app store policies, Roblox paid random items,
 local law such as Korea's probability disclosure duty) and how to display the odds is yours to check. This is not legal advice.
 
+## Data and privacy
+
+game-econ-sim makes no network requests and sends nothing anywhere. It reads only the files you pass on the command line
+and writes only the report files you name. Pull logs can identify players: pseudonymise player ids before running `verify`.
+
 ## Roadmap
 
 Comparing against live metrics (Roblox Open Cloud Analytics, GA4, GameAnalytics, CSV) · rewarded ads · season pass ·
@@ -178,6 +183,8 @@ node src/cli.mjs verify examples/pet_sim.econ.json \
 형식 문서: [INPUT_SPEC.md](INPUT_SPEC.md). 결과의 확률 공개표는 설정 파일 기준입니다. 실제 게임 코드가 같은 가중치·천장을 쓰는지,
 어떤 공개 규정(스토어 정책, 로블록스 유료 랜덤 아이템 규정, 국내 게임산업법의 확률 공개 의무 등)이 적용되는지는 직접 확인하세요.
 법률 자문이 아닙니다.
+
+네트워크 요청을 하지 않고 어디로도 데이터를 보내지 않습니다. 명령에 넘긴 파일만 읽고, 지정한 리포트 파일만 씁니다. 뽑기 로그의 플레이어 식별자는 가명 처리한 뒤 넣으세요.
 
 라이선스는 AGPL-3.0입니다. 수정본을 서비스로 운영하면 소스를 공개해야 합니다. AGPL 의무 없는 상용 라이선스는
 [@GlorisMoon](https://github.com/GlorisMoon)으로 문의하세요.
