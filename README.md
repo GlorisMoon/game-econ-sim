@@ -136,7 +136,7 @@ local law such as Korea's probability disclosure duty) and how to display the od
 
 ## Data and privacy
 
-game-econ-sim makes no network requests and sends nothing anywhere. It reads only the files you pass on the command line
+game-econ-sim makes no network requests and sends nothing anywhere ([PRIVACY.md](PRIVACY.md)). It reads only the files you pass on the command line
 and writes only the report files you name. Pull logs can identify players: pseudonymise player ids before running `verify`.
 
 ## Roadmap

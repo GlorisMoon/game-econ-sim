@@ -14,7 +14,8 @@
     "src",
     "examples",
     "INPUT_SPEC.md",
-    "VERIFY.md"
+    "VERIFY.md",
+    "PRIVACY.md"
   ],
   "engines": {
     "node": ">=18.17"

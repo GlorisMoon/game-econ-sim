@@ -1,5 +1,6 @@
 {
   "name": "game-econ-sim",
+  "displayName": "Game Economy Simulator",
   "version": "0.2.0",
   "description": "Write a free-to-play game economy as one JSON file and simulate it locally, then verify lootbox odds: disclosed table vs config, server pull logs vs config (statistical tests, pity violations), and a publishable odds table. Roblox first, mobile and web too.",
   "author": {
@@ -8,6 +9,10 @@
   },
   "homepage": "https://github.com/GlorisMoon/game-econ-sim",
   "repository": "https://github.com/GlorisMoon/game-econ-sim",
+  "documentationUrl": "https://github.com/GlorisMoon/game-econ-sim#readme",
+  "supportUrl": "https://github.com/GlorisMoon/game-econ-sim/issues",
+  "privacyPolicyUrl": "https://github.com/GlorisMoon/game-econ-sim/blob/main/PRIVACY.md",
+  "termsOfServiceUrl": "https://github.com/GlorisMoon/game-econ-sim/blob/main/LICENSE",
   "license": "AGPL-3.0-only",
   "keywords": [
     "balancing",
