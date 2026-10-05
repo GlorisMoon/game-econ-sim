@@ -1,0 +1,170 @@
+{
+  "schema": "econ-sim/0.1",
+  "game": {"name": "펫 수집 시뮬레이터 (예시)"},
+  "platform": "roblox",
+  "sim": {"days": 30, "players": 10000, "runs": 5, "seed": 7},
+
+  "currencies": [
+    {"id": "coins", "kind": "soft", "start": 0},
+    {"id": "gems", "kind": "hard", "start": 50},
+    {"id": "candy", "kind": "event", "start": 0}
+  ],
+
+  "stats": [
+    {"id": "coin_mult", "base": 1},
+    {"id": "luck", "base": 1},
+    {"id": "pet_slots", "base": 3}
+  ],
+
+  "activities": [
+    {"id": "farm_z1", "kind": "repeatable", "minutes": 1,
+     "rewards": [{"currency": "coins", "amount": {"dist": "normal", "mean": 40, "sd": 8}, "scaledBy": ["coin_mult"]}]},
+    {"id": "farm_z2", "kind": "repeatable", "minutes": 1, "unlock": {"owns": "zone_2"},
+     "rewards": [{"currency": "coins", "amount": {"dist": "normal", "mean": 160, "sd": 30}, "scaledBy": ["coin_mult"]}]},
+    {"id": "farm_z3", "kind": "repeatable", "minutes": 1, "unlock": {"owns": "zone_3"},
+     "rewards": [{"currency": "coins", "amount": {"dist": "normal", "mean": 700, "sd": 120}, "scaledBy": ["coin_mult"]}]},
+    {"id": "timed_chest", "kind": "cooldown", "cooldownMinutes": 15,
+     "rewards": [{"currency": "coins", "amount": {"dist": "uniform", "min": 200, "max": 600}, "scaledBy": ["coin_mult"]}]},
+    {"id": "daily_login", "kind": "daily",
+     "rewardsByDay": [
+       [{"currency": "gems", "amount": 5}],
+       [{"currency": "gems", "amount": 5}],
+       [{"currency": "gems", "amount": 10}],
+       [{"currency": "gems", "amount": 10}],
+       [{"currency": "gems", "amount": 15}],
+       [{"currency": "gems", "amount": 15}],
+       [{"currency": "gems", "amount": 50}]
+     ]},
+    {"id": "daily_quests", "kind": "daily", "limitPerDay": 3, "minutes": 4,
+     "rewards": [
+       {"currency": "gems", "amount": 5},
+       {"currency": "coins", "amount": 300, "scaledBy": ["coin_mult"]}
+     ]},
+    {"id": "afk", "kind": "offline", "capHours": 8,
+     "rewards": [{"currency": "coins", "amount": 600, "scaledBy": ["coin_mult"]}]},
+    {"id": "candy_hunt", "kind": "repeatable", "minutes": 2, "during": "halloween",
+     "rewards": [{"currency": "candy", "amount": {"dist": "uniform", "min": 3, "max": 6}}]}
+  ],
+
+  "items": [
+    {"id": "zone_2", "kind": "unlock", "cost": {"coins": 5000}},
+    {"id": "zone_3", "kind": "unlock", "cost": {"coins": 120000}, "unlock": {"owns": "zone_2"}},
+    {"id": "coin_upgrade", "kind": "upgrade", "maxLevel": 40,
+     "cost": {"coins": {"curve": "geometric", "base": 300, "ratio": 1.22}},
+     "effects": [{"stat": "coin_mult", "add": 0.08}]},
+    {"id": "slot_upgrade", "kind": "upgrade", "maxLevel": 3,
+     "cost": {"gems": {"curve": "table", "values": [100, 250, 500]}},
+     "effects": [{"stat": "pet_slots", "add": 1}]},
+    {"id": "coin_potion", "kind": "consumable", "cost": {"gems": 30},
+     "effects": [{"stat": "coin_mult", "mul": 2, "durationMinutes": 60}]},
+    {"id": "pumpkin_trade", "kind": "exchange", "during": "halloween", "limit": 1,
+     "cost": {"candy": 300}, "grants": {"collectible": "pumpkin_cat"}}
+  ],
+
+  "lootboxes": [
+    {"id": "egg_basic", "cost": {"coins": 1000},
+     "pool": [
+       {"grant": {"collectible": "dog"}, "weight": 70, "rarity": "common"},
+       {"grant": {"collectible": "cat"}, "weight": 25, "rarity": "rare"},
+       {"grant": {"collectible": "owl"}, "weight": 4.5, "rarity": "epic"},
+       {"grant": {"collectible": "dragon"}, "weight": 0.5, "rarity": "legendary"}
+     ],
+     "luck": {"stat": "luck", "rarities": ["legendary"]}},
+    {"id": "egg_forest", "cost": {"coins": 25000}, "unlock": {"owns": "zone_2"},
+     "pool": [
+       {"grant": {"collectible": "cat"}, "weight": 60, "rarity": "rare"},
+       {"grant": {"collectible": "fox"}, "weight": 35, "rarity": "epic"},
+       {"grant": {"collectible": "dragon"}, "weight": 4.9, "rarity": "legendary"},
+       {"grant": {"collectible": "phoenix"}, "weight": 0.1, "rarity": "mythic"}
+     ],
+     "pity": {"rarity": "legendary", "hard": 200, "soft": {"from": 150, "addWeightPerPull": 0.5}},
+     "luck": {"stat": "luck", "rarities": ["legendary", "mythic"]}},
+    {"id": "egg_robux", "price": 99,
+     "pool": [
+       {"grant": {"collectible": "fox"}, "weight": 70, "rarity": "epic"},
+       {"grant": {"collectible": "dragon"}, "weight": 26, "rarity": "legendary"},
+       {"grant": {"collectible": "phoenix"}, "weight": 4, "rarity": "mythic"}
+     ],
+     "pity": {"rarity": "mythic", "hard": 30},
+     "luck": {"stat": "luck", "rarities": ["mythic"]}}
+  ],
+
+  "collectibles": [
+    {"id": "dog", "rarity": "common", "effects": [{"stat": "coin_mult", "add": 0.05}]},
+    {"id": "cat", "rarity": "rare", "effects": [{"stat": "coin_mult", "add": 0.15}]},
+    {"id": "owl", "rarity": "epic", "effects": [{"stat": "luck", "add": 0.1}, {"stat": "coin_mult", "add": 0.2}]},
+    {"id": "fox", "rarity": "epic", "effects": [{"stat": "coin_mult", "add": 0.4}]},
+    {"id": "dragon", "rarity": "legendary", "effects": [{"stat": "coin_mult", "add": 1.0}]},
+    {"id": "phoenix", "rarity": "mythic", "effects": [{"stat": "coin_mult", "add": 2.5}]},
+    {"id": "pumpkin_cat", "rarity": "epic", "effects": [{"stat": "coin_mult", "add": 0.6}]}
+  ],
+  "collection": {
+    "equipLimitStat": "pet_slots",
+    "equipBy": "coin_mult",
+    "duplicates": {"convertTo": {"gems": 1}}
+  },
+
+  "rebirth": {
+    "cost": {"coins": {"curve": "geometric", "base": 500000, "ratio": 3}},
+    "resets": ["coins", "coin_upgrade", "zone_2", "zone_3"],
+    "effects": [{"stat": "coin_mult", "mul": 1.5}]
+  },
+
+  "offers": [
+    {"id": "vip_2x", "type": "gamePass", "price": 199, "effects": [{"stat": "coin_mult", "mul": 2}]},
+    {"id": "lucky_pass", "type": "gamePass", "price": 299, "effects": [{"stat": "luck", "mul": 1.5}]},
+    {"id": "extra_slots", "type": "gamePass", "price": 149, "effects": [{"stat": "pet_slots", "add": 2}]},
+    {"id": "gems_s", "type": "devProduct", "price": 49, "grants": {"gems": 100}},
+    {"id": "gems_l", "type": "devProduct", "price": 399, "grants": {"gems": 1000}},
+    {"id": "starter_pack", "type": "devProduct", "price": 79, "limit": 1,
+     "window": {"fromJoinDay": 0, "toJoinDay": 3},
+     "grants": {"gems": 300, "collectible": "cat"}}
+  ],
+
+  "segments": [
+    {"id": "casual", "share": 0.65,
+     "retention": {"d1": 0.22, "d7": 0.07, "d30": 0.02},
+     "sessionsPerDay": {"dist": "poisson", "mean": 1.2},
+     "sessionMinutes": {"dist": "lognormal", "median": 10, "p90": 30},
+     "spend": {"payerRate": 0.01,
+               "firstPurchaseDay": {"dist": "lognormal", "median": 1, "p90": 5},
+               "budget": {"dist": "lognormal", "median": 80, "p90": 400},
+               "priority": ["starter_pack", "gems_s", "vip_2x"]},
+     "policy": {"lootboxShare": 0.4, "rebirth": "asap"}},
+    {"id": "grinder", "share": 0.30,
+     "retention": {"d1": 0.40, "d7": 0.18, "d30": 0.07},
+     "sessionsPerDay": {"dist": "poisson", "mean": 2.5},
+     "sessionMinutes": {"dist": "lognormal", "median": 35, "p90": 90},
+     "spend": {"payerRate": 0.04,
+               "firstPurchaseDay": {"dist": "lognormal", "median": 3, "p90": 12},
+               "budget": {"dist": "lognormal", "median": 250, "p90": 1200},
+               "priority": ["vip_2x", "extra_slots", "starter_pack", "gems_l"]},
+     "policy": {"lootboxShare": 0.5, "rebirth": "asap"}},
+    {"id": "whale", "share": 0.05,
+     "retention": {"d1": 0.60, "d7": 0.35, "d30": 0.18},
+     "sessionsPerDay": {"dist": "poisson", "mean": 3},
+     "sessionMinutes": {"dist": "lognormal", "median": 50, "p90": 150},
+     "spend": {"payerRate": 0.3,
+               "firstPurchaseDay": {"dist": "lognormal", "median": 1, "p90": 4},
+               "budget": {"dist": "lognormal", "median": 1500, "p90": 10000},
+               "priority": ["vip_2x", "lucky_pass", "extra_slots", "egg_robux", "gems_l"]},
+     "policy": {"lootboxShare": 0.7, "rebirth": "asap", "consumables": ["coin_potion"]}}
+  ],
+
+  "events": [
+    {"id": "halloween", "startDay": 10, "endDay": 17, "expires": ["candy"]}
+  ],
+
+  "targets": [
+    {"id": "zone2_fast", "check": "daysToOwn", "item": "zone_2", "segment": "casual", "between": [0.2, 1.5]},
+    {"id": "zone3_week", "check": "daysToOwn", "item": "zone_3", "segment": "grinder", "between": [3, 7]},
+    {"id": "first_rebirth", "check": "daysToRebirth", "count": 1, "segment": "grinder", "between": [5, 10]},
+    {"id": "coin_inflation", "check": "walletGrowthPerDay", "currency": "coins", "fromDay": 7, "max": 0.08},
+    {"id": "gem_sinks", "check": "sinkCoverage", "currency": "gems", "min": 0.6},
+    {"id": "dragon_basic", "check": "pullsToRarity", "lootbox": "egg_basic", "rarity": "legendary", "percentile": 90, "max": 500},
+    {"id": "phoenix_robux", "check": "priceToRarity", "lootbox": "egg_robux", "rarity": "mythic", "max": 2000},
+    {"id": "cvr", "check": "payerConversion", "day": 30, "between": [0.01, 0.05]},
+    {"id": "arpdau", "check": "arpdau", "fromDay": 0, "toDay": 29, "between": [2, 10]},
+    {"id": "vip_share", "check": "offerRevenueShare", "offer": "vip_2x", "max": 0.5}
+  ]
+}

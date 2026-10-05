@@ -1,0 +1,18 @@
+{
+  "name": "game-econ-sim",
+  "version": "0.1.0",
+  "description": "Local Monte Carlo simulator for free-to-play game economies (Roblox, mobile, web): progression, inflation, sinks, pity-aware lootbox odds disclosure, revenue, design targets.",
+  "type": "module",
+  "bin": { "game-econ-sim": "src/cli.mjs" },
+  "scripts": {
+    "test": "node test/check.mjs",
+    "example": "node src/cli.mjs examples/pet_sim.econ.json"
+  },
+  "files": ["src", "examples", "INPUT_SPEC.md"],
+  "engines": { "node": ">=18.17" },
+  "keywords": ["game-economy", "roblox", "gacha", "loot-box", "monte-carlo", "simulation", "f2p", "balancing"],
+  "license": "AGPL-3.0-only",
+  "author": "GlorisMoon",
+  "repository": "github:GlorisMoon/game-econ-sim",
+  "homepage": "https://github.com/GlorisMoon/game-econ-sim"
+}

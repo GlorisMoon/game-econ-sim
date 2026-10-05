@@ -1,0 +1,11 @@
+{
+  "name": "game-econ-sim",
+  "version": "0.1.0",
+  "description": "Write a free-to-play game economy as one JSON file and simulate it locally: progression times, inflation, sinks, pity-aware lootbox odds disclosure, revenue and design-target checks. Roblox first, mobile and web too.",
+  "author": { "name": "GlorisMoon", "url": "https://github.com/GlorisMoon" },
+  "homepage": "https://github.com/GlorisMoon/game-econ-sim",
+  "repository": "https://github.com/GlorisMoon/game-econ-sim",
+  "license": "AGPL-3.0-only",
+  "keywords": ["game-economy", "roblox", "gacha", "loot-box", "simulation", "balancing"],
+  "skills": "./skills"
+}
