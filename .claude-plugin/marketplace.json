@@ -2,16 +2,29 @@
   "$schema": "https://json.schemastore.org/claude-code-marketplace.json",
   "name": "game-econ-sim",
   "description": "Local game economy simulator for Roblox, mobile and web games.",
-  "owner": { "name": "GlorisMoon", "url": "https://github.com/GlorisMoon" },
+  "owner": {
+    "name": "GlorisMoon",
+    "url": "https://github.com/GlorisMoon"
+  },
   "plugins": [
     {
       "name": "game-econ-sim",
-      "version": "0.1.0",
-      "source": { "source": "github", "repo": "GlorisMoon/game-econ-sim" },
-      "description": "Write a free-to-play game economy as one JSON file and simulate it locally: progression, inflation, sinks, pity-aware lootbox odds disclosure, revenue and design-target checks.",
+      "version": "0.2.0",
+      "source": {
+        "source": "github",
+        "repo": "GlorisMoon/game-econ-sim"
+      },
+      "description": "Simulate a free-to-play game economy locally and verify lootbox odds: disclosed table vs config, server pull logs vs config, publishable odds table.",
       "homepage": "https://github.com/GlorisMoon/game-econ-sim",
       "license": "AGPL-3.0-only",
-      "keywords": ["game-economy", "roblox", "gacha", "loot-box", "simulation"]
+      "keywords": [
+        "gacha",
+        "game-economy",
+        "loot-box",
+        "odds-disclosure",
+        "roblox",
+        "simulation"
+      ]
     }
   ]
 }

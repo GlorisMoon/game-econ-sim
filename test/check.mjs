@@ -5,6 +5,9 @@ import { rng } from '../src/random.mjs';
 import { pull, disclosure, pullsToRarity } from '../src/odds.mjs';
 import { validate } from '../src/validate.mjs';
 import { simulate } from '../src/sim.mjs';
+import { normalCdf, normalQuantile, chiSquareSf } from '../src/stats.mjs';
+import { verify, parseTable } from '../src/verify.mjs';
+import { pullLog } from '../examples/make-pulls.mjs';
 
 // 1. Exact pity math agrees with brute-force pulls.
 const box = {
@@ -49,5 +52,36 @@ const a = simulate(small);
 assert.deepEqual(a, simulate(small));
 assert.ok(Math.abs(a.retention.simulated.d1 - a.retention.assumed.d1) < 0.03, 'D1');
 assert.ok(Math.abs(a.retention.simulated.d7 - a.retention.assumed.d7) < 0.03, 'D7');
+
+// 4. Statistics helpers hit textbook values.
+assert.ok(Math.abs(normalCdf(1.959964) - 0.975) < 1e-6);
+assert.ok(Math.abs(normalQuantile(0.975) - 1.959964) < 1e-5);
+assert.ok(Math.abs(chiSquareSf(3.841459, 1) - 0.05) < 1e-5);
+assert.ok(Math.abs(chiSquareSf(5.991465, 2) - 0.05) < 1e-5);
+assert.ok(Math.abs(chiSquareSf(18.307038, 10) - 0.05) < 1e-5);
+
+// 5. Verification: faithful server passes the log checks, the buggy one fails, disclosure rules hold.
+const ex = (f) => parseTable(readFileSync(new URL(`../examples/${f}`, import.meta.url), 'utf8'));
+const robux = (res) => res.boxes.find((b) => b.id === 'egg_robux');
+const good = robux(verify(cfg, { logs: ex('pulls_ok.csv'), disclosed: ex('disclosed.csv') }));
+assert.equal(good.verdict, 'warn');
+assert.deepEqual(good.reasons.map((r) => r.code).sort(), ['disclosure_base', 'luck_not_logged']);
+assert.equal(good.log.pity.violations, 0);
+const bad = robux(verify(cfg, { logs: ex('pulls_bug.csv') }));
+assert.equal(bad.verdict, 'fail');
+assert.ok(bad.log.pity.violations > 0 && bad.reasons.some((r) => r.code === 'item_rejected'));
+
+const egg = cfg.lootboxes.find((b) => b.id === 'egg_robux');
+const table = (f) => disclosure(egg).rows.map((r) => ({ box: 'egg_robux', item: r.grant, probability: f(r) }));
+assert.deepEqual(robux(verify(cfg, { disclosed: table((r) => `${(r.effective * 100).toFixed(3)}%`) })).disclosure.reasons, []);
+assert.ok(robux(verify(cfg, { disclosed: table((r) => (r.rarity === 'mythic' ? '3%' : `${r.base * 100}%`)) })).reasons.some((r) => r.code === 'disclosure_mismatch'));
+assert.ok(robux(verify(cfg, { disclosed: [{ box: 'egg_basic', item: 'dog', probability: '70%' }] })).reasons.some((r) => r.code === 'disclosure_absent'));
+
+// False alarms on a faithful server stay near alpha (item tests + goodness of fit).
+let falseFails = 0;
+for (let seed = 100; seed < 200; seed++) {
+  if (robux(verify(cfg, { logs: parseTable(pullLog(egg, seed, 400)) })).verdict === 'fail') falseFails++;
+}
+assert.ok(falseFails <= 12, `false fail rate ${falseFails}%`);
 
 console.log('ok');

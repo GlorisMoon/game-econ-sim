@@ -3,6 +3,7 @@
 게임 하나의 경제 설계를 JSON 파일 하나(`*.econ.json`)로 적는다. 엔진은 이 파일로 플레이어 집단을 몬테카를로로 돌리고,
 `targets`(설계 의도)를 판정하고, 뽑기 확률 공개표를 정확 계산으로 낸다.
 전체 예시: [examples/pet_sim.econ.json](examples/pet_sim.econ.json) (로블록스 펫 수집 시뮬레이터형 게임)
+같은 파일로 공개 확률표와 서버 뽑기 로그를 검증하는 방법은 [VERIFY.md](VERIFY.md).
 
 ## 원칙
 

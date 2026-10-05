@@ -1,22 +1,32 @@
 #!/usr/bin/env node
 import { readFileSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { basename } from 'node:path';
 import { parseArgs } from 'node:util';
 import { validate } from './validate.mjs';
 import { simulate, platformOf, VERSION } from './sim.mjs';
 import { disclosure } from './odds.mjs';
+import { verify, parseTable, renderReport } from './verify.mjs';
 
 const USAGE = `game-econ-sim ${VERSION}
 usage: game-econ-sim <game.econ.json> [--runs N] [--players N] [--seed N] [--json report.json] [--odds]
+       game-econ-sim verify <game.econ.json> [--logs pulls.csv] [--disclosed table.csv]
+                     [--report report.md] [--json out.json] [--lang en|ko] [--alpha 0.05] [--digits 3]
   --odds   print the lootbox odds disclosure only (no simulation)
-exit: 0 all targets pass · 1 invalid config · 2 some target failed`;
+  verify   check a disclosed odds table and server pull logs against the config (see VERIFY.md)
+exit: 0 pass · 1 invalid input · 2 a target or a box failed`;
 
 const { values: o, positionals } = parseArgs({
   allowPositionals: true,
   options: {
     runs: { type: 'string' }, players: { type: 'string' }, seed: { type: 'string' },
     json: { type: 'string' }, odds: { type: 'boolean' }, help: { type: 'boolean', short: 'h' },
+    logs: { type: 'string' }, disclosed: { type: 'string' }, report: { type: 'string' },
+    lang: { type: 'string' }, alpha: { type: 'string' }, digits: { type: 'string' },
   },
 });
+const verifying = positionals[0] === 'verify';
+if (verifying) positionals.shift();
 if (o.help || positionals.length !== 1) {
   console.log(USAGE);
   process.exit(o.help ? 0 : 1);
@@ -34,6 +44,36 @@ const pct = (x, d = 1) => (x == null ? '—' : `${(x * 100).toFixed(d)}%`);
 const num = (x, d = 0) => (x == null ? '—' : x.toLocaleString('en-US', { maximumFractionDigits: d }));
 const big = (x) => (Math.abs(x) >= 1e9 ? `${(x / 1e9).toFixed(2)}B` : Math.abs(x) >= 1e6 ? `${(x / 1e6).toFixed(2)}M` : Math.abs(x) >= 1e4 ? `${(x / 1e3).toFixed(1)}k` : num(x));
 const pad = (s, n) => String(s).padEnd(n);
+
+if (verifying) {
+  const read = (path) => readFileSync(path, 'utf8');
+  const sha = (text) => createHash('sha256').update(text).digest('hex').slice(0, 12);
+  const files = [{ role: 'config', name: basename(positionals[0]), sha: sha(read(positionals[0])) }];
+  let logs = null, disclosed = null;
+  try {
+    if (o.logs) { const x = read(o.logs); logs = parseTable(x); files.push({ role: 'logsF', name: basename(o.logs), sha: sha(x) }); }
+    if (o.disclosed) { const x = read(o.disclosed); disclosed = parseTable(x); files.push({ role: 'disclosedF', name: basename(o.disclosed), sha: sha(x) }); }
+  } catch (e) {
+    console.error(`cannot read input: ${e.message}`);
+    process.exit(1);
+  }
+  const alpha = o.alpha ? +o.alpha : 0.05, digits = o.digits ? +o.digits : 3, lang = o.lang === 'ko' ? 'ko' : 'en';
+  if (!(alpha > 0 && alpha < 1) || !(digits >= 0 && digits <= 6)) { console.error('--alpha must be in (0,1), --digits in 0..6'); process.exit(1); }
+  const res = verify(cfg, { logs, disclosed, alpha });
+  const meta = { game: cfg.game?.name, files, generated: new Date().toISOString().slice(0, 16).replace('T', ' ') + ' UTC', version: VERSION, unit: plat.unit, digits, boxes: cfg.lootboxes ?? [] };
+  const md = renderReport(res, meta, lang);
+  if (o.report) writeFileSync(o.report, md);
+  if (o.json) writeFileSync(o.json, JSON.stringify({ ...res, meta }, null, 2));
+  console.log(`game-econ-sim ${VERSION} verify — ${cfg.game?.name ?? positionals[0]}`);
+  for (const b of res.boxes) {
+    console.log(`  ${pad(b.id, 14)}${pad(b.verdict.toUpperCase(), 9)}${b.log ? `${num(b.log.pulls)} pulls` : 'no logs'}`);
+    for (const r of b.reasons) console.log(`      ${r.severity === 'fail' ? '✗' : '!'} ${r.code}${r.items ? `: ${r.items.join(', ')}` : r.n != null ? `: ${r.n}` : ''}`);
+  }
+  if (Object.keys(res.unknownBoxes).length) console.log(`  logs for boxes not in config: ${Object.keys(res.unknownBoxes).join(', ')}`);
+  if (o.report) console.log(`\nreport: ${o.report}`);
+  process.exit(res.boxes.some((b) => b.verdict === 'fail') ? 2 : 0);
+}
+
 
 function printOdds(b, odds) {
   const priced = b.price != null;

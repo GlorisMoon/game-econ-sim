@@ -2,7 +2,7 @@
 import { rng, sample, sampleSum, moments, curve } from './random.mjs';
 import { pull, disclosure, pullsToRarity } from './odds.mjs';
 
-export const VERSION = '0.1.0';
+export const VERSION = '0.2.0';
 
 // Defaults only; override with "platform": {"id": ..., "unit": ..., "fee": ...}.
 const PLATFORMS = {
